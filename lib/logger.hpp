@@ -1,17 +1,12 @@
 #pragma once
 
-#include <string>
 #include <fstream>
 #include <mutex>
+#include <string>
 
 // Уровень через перечисление с понятными именами
 // enum class чтобы не превращались в числа
-enum class LogLevel {
-    DEBUG = 0,
-    INFO,
-    WARNING,
-    ERROR
-};
+enum class LogLevel { DEBUG = 0, INFO, WARNING, ERROR };
 
 class Logger {
 public:
@@ -34,4 +29,9 @@ public:
 private:
     std::ofstream file_stream_;
     LogLevel current_level_;
+    std::mutex mutex_; // Делаем сам логгер потокобезопасным на всякий случай
+
+    // Вспомогательные методы
+    std::string level_to_string(LogLevel level) const;
+    std::string get_current_time() const;
 };
