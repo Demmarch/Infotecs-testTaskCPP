@@ -4,6 +4,7 @@ ColumnLimit:     100
 IndentWidth:     4
 TabWidth:        4
 ContinuationIndentWidth: 4
+AccessModifierOffset: -4
 
 PointerAlignment: Left
 
