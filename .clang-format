@@ -1,0 +1,14 @@
+Language:        Cpp
+BasedOnStyle:    LLVM
+ColumnLimit:     100
+IndentWidth:     4
+TabWidth:        4
+ContinuationIndentWidth: 4
+
+PointerAlignment: Left
+
+AlignOperands:   Align
+
+AllowShortBlocksOnASingleLine: Always
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: WithoutElse
