@@ -1,0 +1,56 @@
+[
+  {
+    "file": "lib/logger.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-fPIC",
+      "-I./lib",
+      "-c",
+      "lib/logger.cpp",
+      "-o",
+      "lib/logger.o"
+    ],
+    "directory": "/home/demmarc/WorkAndStudy/Infotecs/testTaskCPP",
+    "output": "lib/logger.o"
+  },
+  {
+    "file": "lib/utils.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-fPIC",
+      "-I./lib",
+      "-c",
+      "lib/utils.cpp",
+      "-o",
+      "lib/utils.o"
+    ],
+    "directory": "/home/demmarc/WorkAndStudy/Infotecs/testTaskCPP",
+    "output": "lib/utils.o"
+  },
+  {
+    "file": "app/main.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-fPIC",
+      "-I./lib",
+      "-c",
+      "app/main.cpp",
+      "-o",
+      "app/main.o"
+    ],
+    "directory": "/home/demmarc/WorkAndStudy/Infotecs/testTaskCPP",
+    "output": "app/main.o"
+  }
+]
