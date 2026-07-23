@@ -125,9 +125,7 @@ int main(int argc, char* argv[]) {
         // Штатное завершение работы
         LogTask exit_task;
         exit_task.is_exit = true;
-        queue.push(exit_task);
-
-        worker.join(); // ЖДАТЬ
+        queue.push(exit_task);\
 
         std::cout << "Завершение работы.\n";
 

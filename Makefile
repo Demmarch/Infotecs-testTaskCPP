@@ -18,7 +18,7 @@ APP_SRC = $(wildcard app/*.cpp)
 APP_OBJ = $(APP_SRC:.cpp=.o)
 
 # Указываем, что эти цели не являются файлами
-.PHONY: all lib app clean
+.PHONY: all lib app clean rebuild
 
 # Цель по умолчанию (собирает всё)
 all: lib app

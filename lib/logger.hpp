@@ -1,7 +1,6 @@
 #pragma once
 
-#include <fstream>
-#include <mutex>
+#include <memory>
 #include <string>
 
 // Уровень через перечисление с понятными именами
@@ -27,11 +26,6 @@ public:
     void log(LogLevel level, const std::string& message);
 
 private:
-    std::ofstream file_stream_;
-    LogLevel current_level_;
-    std::mutex mutex_; // Делаем сам логгер потокобезопасным на всякий случай
-
-    // Вспомогательные методы
-    std::string level_to_string(LogLevel level) const;
-    std::string get_current_time() const;
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 };
