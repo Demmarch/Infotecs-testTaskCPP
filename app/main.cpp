@@ -1,10 +1,10 @@
 #include "../lib/logger.hpp"
 #include "thread_safe_queue.hpp"
 #include <iostream>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
+#include <optional>
 
 struct LogTask {
     LogLevel level;
@@ -40,8 +40,9 @@ LogTask parse_input(std::string_view input, LogLevel default_level) {
         }
     }
 
-    std::string_view msg_view =
-        (colon_pos != std::string_view::npos) ? input.substr(colon_pos + 1) : input;
+    std::string_view msg_view = (colon_pos != std::string_view::npos)
+                                ? input.substr(colon_pos + 1)
+                                : input;
 
     size_t first_char = msg_view.find_first_not_of(" \t");
     if (first_char != std::string_view::npos) {
@@ -53,11 +54,12 @@ LogTask parse_input(std::string_view input, LogLevel default_level) {
 
 class ThreadJoiner {
     std::thread& t_;
-
 public:
     explicit ThreadJoiner(std::thread& t) : t_(t) {}
     ~ThreadJoiner() {
-        if (t_.joinable()) { t_.join(); }
+        if (t_.joinable()) {
+            t_.join();
+        }
     }
 };
 
@@ -67,7 +69,9 @@ void logger_worker(Logger& logger, ThreadSafeQueue<LogTask>& queue) {
             LogTask task;
             queue.wait_and_pop(task);
 
-            if (task.is_exit) { break; }
+            if (task.is_exit) {
+                break;
+            }
 
             logger.log(task.level, task.message);
         }
@@ -77,7 +81,7 @@ void logger_worker(Logger& logger, ThreadSafeQueue<LogTask>& queue) {
 }
 
 int main(int argc, char* argv[]) {
-    // ПО ТЗ Параметрами приложения должны быть имя файла журнала и уровень по умолчанию
+    // ПО ТЗ - параметрами приложения должны быть имя файла журнала и уровень по умолчанию
     if (argc < 3) {
         std::cerr << "Использование: " << argv[0]
                   << " <файл_журнала> <уровень_по_умолчанию (DEBUG|INFO|WARNING|ERROR)>\n";
@@ -98,7 +102,7 @@ int main(int argc, char* argv[]) {
         ThreadJoiner joiner(worker);
 
         std::cout << "Приложение запущено. Вводите сообщения для записи.\n";
-        std::cout << "Формат ввода: [УРОВЕНЬ:] текст сообщения\n";
+        std::cout << "Формат ввода: ''УРОВЕНЬ:'' текст сообщения\n";
         std::cout << "Например: 'ERROR: нет подключения' или просто 'тестовое сообщение'\n";
         std::cout << "Для выхода введите 'exit' или нажмите Ctrl+D.\n";
 
@@ -106,28 +110,28 @@ int main(int argc, char* argv[]) {
         while (true) {
             std::cout << "> ";
 
-            // Читаем ввод. std::getline вернет false при EOF (Ctrl+D)
-            if (!std::getline(std::cin, input) || input == "exit") { break; }
+            if (!std::getline(std::cin, input) || input == "exit") {
+                break;
+            }
 
-            if (input.empty()) { continue; }
+            if (input.empty()) {
+                continue;
+            }
 
-            // Парсим ввод и отправляем задачу в очередь
             LogTask task = parse_input(input, default_level);
             queue.push(task);
         }
 
-        // Штатное завершение работы (Poison Pill)
+        // Штатное завершение работы
         LogTask exit_task;
         exit_task.is_exit = true;
         queue.push(exit_task);
 
-        // Обязательно ждем завершения фонового потока, иначе программа упадет (std::terminate)
-        worker.join();
+        worker.join(); // ЖДАТЬ
 
         std::cout << "Завершение работы.\n";
 
     } catch (const std::exception& e) {
-        // Ловим ошибки инициализации (например, если файл недоступен)
         std::cerr << "Критическая ошибка: " << e.what() << "\n";
         return 1;
     }

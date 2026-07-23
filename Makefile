@@ -43,3 +43,5 @@ $(APP_OUT): $(APP_OBJ) $(LIB_OUT)
 # Очистка от временных файлов и бинарников
 clean:
 	rm -f lib/*.o app/*.o $(LIB_OUT) $(APP_OUT)
+
+rebuild: clean all
