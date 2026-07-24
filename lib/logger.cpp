@@ -27,11 +27,16 @@ struct Logger::Impl {
 
     std::string level_to_string(LogLevel level) const {
         switch (level) {
-        case LogLevel::DEBUG:   return "DEBUG";
-        case LogLevel::INFO:    return "INFO";
-        case LogLevel::WARNING: return "WARNING";
-        case LogLevel::ERROR:   return "ERROR";
-        default:                return "UNKNOWN";
+        case LogLevel::DEBUG:
+            return "DEBUG";
+        case LogLevel::INFO:
+            return "INFO";
+        case LogLevel::WARNING:
+            return "WARNING";
+        case LogLevel::ERROR:
+            return "ERROR";
+        default:
+            return "UNKNOWN";
         }
     }
 
@@ -66,11 +71,13 @@ void Logger::log(LogLevel level, const std::string& message) {
     if (level < impl_->current_level_) { return; }
 
     // Текст, уровень, время
-    std::string log_entry =
-        "[" + impl_->get_current_time() + "] " + "[" + impl_->level_to_string(level) + "] " + message + "\n";
+    std::string log_entry = "[" + impl_->get_current_time() + "] " + "[" +
+                            impl_->level_to_string(level) + "] " + message + "\n";
 
     impl_->file_stream_ << log_entry;
-    impl_->file_stream_.flush(); // Форсируем запись на диск, чтобы логи не терялись при краше
+
+    // Сброс буфера только для критических сообщений
+    if (level == LogLevel::ERROR) { impl_->file_stream_.flush(); }
 
     // Обработка ошибок
     if (impl_->file_stream_.fail()) {

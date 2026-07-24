@@ -1,10 +1,12 @@
 #include "../lib/logger.hpp"
 #include "thread_safe_queue.hpp"
+#include <csignal>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
-#include <optional>
+#include <unistd.h>
 
 struct LogTask {
     LogLevel level;
@@ -40,9 +42,8 @@ LogTask parse_input(std::string_view input, LogLevel default_level) {
         }
     }
 
-    std::string_view msg_view = (colon_pos != std::string_view::npos)
-                                ? input.substr(colon_pos + 1)
-                                : input;
+    std::string_view msg_view =
+        (colon_pos != std::string_view::npos) ? input.substr(colon_pos + 1) : input;
 
     size_t first_char = msg_view.find_first_not_of(" \t");
     if (first_char != std::string_view::npos) {
@@ -54,12 +55,11 @@ LogTask parse_input(std::string_view input, LogLevel default_level) {
 
 class ThreadJoiner {
     std::thread& t_;
+
 public:
     explicit ThreadJoiner(std::thread& t) : t_(t) {}
     ~ThreadJoiner() {
-        if (t_.joinable()) {
-            t_.join();
-        }
+        if (t_.joinable()) { t_.join(); }
     }
 };
 
@@ -69,15 +69,19 @@ void logger_worker(Logger& logger, ThreadSafeQueue<LogTask>& queue) {
             LogTask task;
             queue.wait_and_pop(task);
 
-            if (task.is_exit) {
-                break;
-            }
+            if (task.is_exit) { break; }
 
             logger.log(task.level, task.message);
         }
     } catch (const std::exception& e) {
         std::cerr << "[Фоновый поток] Ошибка записи: " << e.what() << "\n";
     }
+}
+// Нужно для корректной обработки Ctrl+C
+void sigint_handler(int) {
+    // Имитируем конец файла (EOF). Это заставит блокирующий вызов std::getline вернуть false и
+    // прервать цикл.
+    close(STDIN_FILENO);
 }
 
 int main(int argc, char* argv[]) {
@@ -87,6 +91,8 @@ int main(int argc, char* argv[]) {
                   << " <файл_журнала> <уровень_по_умолчанию (DEBUG|INFO|WARNING|ERROR)>\n";
         return 1;
     }
+
+    std::signal(SIGINT, sigint_handler);
 
     std::string filename = argv[1];
     std::string default_level_str = argv[2];
@@ -110,13 +116,9 @@ int main(int argc, char* argv[]) {
         while (true) {
             std::cout << "> ";
 
-            if (!std::getline(std::cin, input) || input == "exit") {
-                break;
-            }
+            if (!std::getline(std::cin, input) || input == "exit") { break; }
 
-            if (input.empty()) {
-                continue;
-            }
+            if (input.empty()) { continue; }
 
             LogTask task = parse_input(input, default_level);
             queue.push(task);
@@ -125,7 +127,7 @@ int main(int argc, char* argv[]) {
         // Штатное завершение работы
         LogTask exit_task;
         exit_task.is_exit = true;
-        queue.push(exit_task);\
+        queue.push(exit_task);
 
         std::cout << "Завершение работы.\n";
 
